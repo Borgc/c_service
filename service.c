@@ -6,7 +6,7 @@
 
 #define USERS_FOLDER "users/"
 
-int user_exist(char *name)
+int user_exist(char *name)// check user
 {
     int n = strlen(USERS_FOLDER) + strlen(name) + 1;
     char path[n];
@@ -39,7 +39,7 @@ void sign_in()
     n = strlen(password);
     password[n-1]='\x00';
 
-    int n = strlen(USERS_FOLDER) + strlen(name) + 1;
+    n = strlen(USERS_FOLDER) + strlen(name) + 1;
     char path[n];
     path[0] = '\x00';
     strcat(path, USERS_FOLDER);
@@ -55,15 +55,19 @@ void sign_in()
         strcat(pass_path, path);
         strcat(pass_path, "/password");
         my_file = fopen(pass_path, "r");
-        fgets()
-        return;
+        char check_pass[255];
+        fgets(check_pass, 255, my_file);
+        if(check_pass == password){
+            return; // need to do smth with existance in your service, some menu or hero page
+        }
+        printf("Wrong password");
     } 
 
-    int n = strlen(USERS_FOLDER) + strlen(name) + 1;
+   /* n = strlen(USERS_FOLDER) + strlen(name) + 1;
     char path[n];
     path[0] = '\x00';
     strcat(path, USERS_FOLDER);
-    strcat(path, name);
+    strcat(path, name);*/
 
 
 }
@@ -117,23 +121,19 @@ void registration()
 
 
 int main(void)
-{
-    printf("sign in or regisration? 1/2");
+{   
+
+    printf("sign in / regisration? 1/2\n");
     char choice1;
     scanf("%c", &choice1);
-    while(choice1 != 1 || choice1 != 2){
-        printf("Wrong input, try 1 or 2 maybe??");
+    while(choice1 != '1' && choice1 != '2'){
+        printf("Wrong input, try 1 or 2 maybe??\n");
+        scanf("%c", &choice1);
     }
     switch(choice1)
     {
         case '1': 
-            printf("enter <login> <password>\n");
-            fgets(name, 255, stdin);
-            fgets(password, 255, stdin);
-            int n = strlen(name);
-            name[n-1]='\x00';
-            n = strlen(password);
-            password[n-1]='\x00';
+            sign_in();
             break;
         case '2': 
             registration();
