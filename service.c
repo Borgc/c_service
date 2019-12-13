@@ -137,9 +137,20 @@ int registration()
 // {
 //     printf("You're inside\nNow you can continue your adventure(press h for help)\n");
 //     int choice2;
+//     choice2 = getc(stdin);
 //     switch(choice2){
 //         case 'h':
-//             printf("1 - random jump\n");
+//             printf("1 - random jump\n2 - jump in coordinates\n3 - weapon\n4 - exit");
+//             break;
+//         case '1':
+//             jump_random()
+//              break;
+//         // case '2':
+//         //     break;
+//         // case '3':
+//         //     break;
+//         // case '4':
+//         //     break;
 //     }
 // }
 
