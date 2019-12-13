@@ -1,2 +1,0 @@
-break /home/slaventy/Progs/C/c_service/service.c:127
-
