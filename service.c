@@ -3,8 +3,10 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <errno.h> /* содержит объявления для errno */
+#include <time.h>
 
 #define USERS_FOLDER "users/"
+#define PLANET "planets/"
 
 int user_exist(char *name)// check user
 {
@@ -65,10 +67,7 @@ int sign_in()
     fgets(check_pass, 16, my_file);
     int i = 0;
     int equal = 1;
-    while(check_pass[i] != 0x0 || password[i] != 0x0){
-        if(check_pass[i] != password[i])equal = 0;
-        i++;
-    }
+    equal = check_password(check_pass, password);
     if(equal){
         printf("Welcome home\n");
         return 1; // сделать папку с планетками (x, y) матрицаб на каждой там бункеры с паролями, рандомная генерация ролла с пушками для убийства других плане
@@ -80,6 +79,14 @@ int sign_in()
     return 0;
 
 
+}
+int check_pass(char chaeck_pass, char password)
+{
+    while(check_pass[i] != 0x0 || password[i] != 0x0){
+        if(check_pass[i] != password[i])return 0;
+        i++;
+    }
+    return 1;
 }
 
 int registration()
@@ -121,7 +128,7 @@ int registration()
     my_file = fopen(pass_path, "w");
     if(my_file == NULL)
     {
-        perror("sorry your file cant't be opened:");
+        perror("sorry your file can't be opened:");
         return 0 ;
     } 
 
@@ -133,26 +140,87 @@ int registration()
     
 }
 
-// void status()
-// {
-//     printf("You're inside\nNow you can continue your adventure(press h for help)\n");
-//     int choice2;
-//     choice2 = getc(stdin);
-//     switch(choice2){
-//         case 'h':
-//             printf("1 - random jump\n2 - jump in coordinates\n3 - weapon\n4 - exit");
-//             break;
-//         case '1':
-//             jump_random()
-//              break;
-//         // case '2':
-//         //     break;
-//         // case '3':
-//         //     break;
-//         // case '4':
-//         //     break;
-//     }
-// }
+int jump_random()
+{
+    int x, y;
+    srand(time(NULL));
+    x = rand() * 13 % 4;
+    y = rand() * 17 % 4;
+    open_planet(x, y);
+}
+void open_planet(int x, int y)
+{
+    char planet_coor[4];
+    planet_coor[0] = '\x00';
+    strcat(planet_coor, x + 0x30);
+    strcat(planet_coor, y + 0x30);
+    planet_coor[2] = '/';
+    int l = strlen(PLANET) + 2 * strlen(planet_coor) + 1;
+    char planet_path[l];
+    planet_path[0] = '\x00';
+    strcat(planet_path, PLANET);
+    strcat(planet_path, planet_coor);
+    strcat(planet_path, planet_coor);
+    FILE *my_file;
+    my_file = fopen(planet_path, "r");
+    if(my_file == NULL)
+    {
+        perror("sorry your file can't be opened:");
+        return 0 ;
+    }
+    fprintf(planet_path);
+    l = strlen(PLANET) + strlen(planet_coor) + strlen("key") + 1;
+    char planet_sec_path[l];
+    planet_sec_path[0] = '\x00';
+    strcat(planet_sec_path, PLANET);
+    strcat(planet_sec_path, planet_coor);
+    strcat(planet_sec_path, "key");
+    printf("enter <password>\n");
+    char password[17];
+    fgets(password, 16, stdin);
+    
+    my_file = fopen(planet_sec_path, "r");
+    char check_pass[17];
+    check_pass[0] = '\x00';
+    fgets(check_pass, 16, planet_sec_path);
+    int access;
+    access = check_password(check_pass, password);
+    if(check_pass[0] == '\x00')access = 2;
+
+    switch(access)
+    {
+        case 0:
+            pritf("Go away stranger\n");
+            return;
+        case 2:
+            //planet_capture()
+            return;
+        case 1:
+            printf("This is your planet");
+            return;
+
+    }
+}
+void status()
+{
+    printf("You're inside\nNow you can continue your adventure(press h for help)\n");
+    int choice2;
+    choice2 = getc(stdin);
+    switch(choice2){
+        case 'h':
+            printf("1 - random jump\n2 - jump in coordinates\n3 - weapon\n4 - exit");
+            break;
+        case '1':
+            jump_random()
+             break;
+        // case '2':
+        //     break;
+        // case '3':
+        //     break;
+        // case '4':
+        //     break;
+    }
+}
 
 
 int main(void)
@@ -185,7 +253,7 @@ int main(void)
             }
         }
 
-        //if(status_reg == 1)status();
+        if(status_reg == 1)status();
     }
     
 end: 
