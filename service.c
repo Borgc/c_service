@@ -25,7 +25,15 @@ int user_exist(char *name)// check user
     }
     return 0;
 }
-
+int check_password(char *check_pass, char *password)
+{   
+    int i = 0;
+    while(check_pass[i] != 0x0 || password[i] != 0x0){
+        if(check_pass[i] != password[i])return 0;
+        i++;
+    }
+    return 1;
+}
 int sign_in()
 {
     char name[17];
@@ -65,7 +73,6 @@ int sign_in()
     my_file = fopen(pass_path, "r");
     char check_pass[17];
     fgets(check_pass, 16, my_file);
-    int i = 0;
     int equal = 1;
     equal = check_password(check_pass, password);
     if(equal){
@@ -79,14 +86,6 @@ int sign_in()
     return 0;
 
 
-}
-int check_pass(char chaeck_pass, char password)
-{
-    while(check_pass[i] != 0x0 || password[i] != 0x0){
-        if(check_pass[i] != password[i])return 0;
-        i++;
-    }
-    return 1;
 }
 
 int registration()
@@ -140,41 +139,36 @@ int registration()
     
 }
 
-int jump_random()
-{
-    int x, y;
-    srand(time(NULL));
-    x = rand() * 13 % 4;
-    y = rand() * 17 % 4;
-    open_planet(x, y);
-}
 void open_planet(int x, int y)
 {
-    char planet_coor[4];
-    planet_coor[0] = '\x00';
-    strcat(planet_coor, x + 0x30);
-    strcat(planet_coor, y + 0x30);
-    planet_coor[2] = '/';
-    int l = strlen(PLANET) + 2 * strlen(planet_coor) + 1;
+    char planet_coor[6];
+    sprintf(planet_coor, "%d%d.%d%d", x/ 10, x % 10, y/ 10, y % 10);
+    planet_coor[5] = 0;
+
+    int l = strlen(PLANET) + 2 * strlen(planet_coor) + 1 + strlen(".txt") + 1;
     char planet_path[l];
     planet_path[0] = '\x00';
     strcat(planet_path, PLANET);
     strcat(planet_path, planet_coor);
+    strcat(planet_path, "/");
     strcat(planet_path, planet_coor);
+    strcat(planet_path, ".txt");
     FILE *my_file;
     my_file = fopen(planet_path, "r");
     if(my_file == NULL)
     {
         perror("sorry your file can't be opened:");
-        return 0 ;
+        return;
     }
-    fprintf(planet_path);
-    l = strlen(PLANET) + strlen(planet_coor) + strlen("key") + 1;
+       //fprintf(planet_path, );
+    l = strlen(PLANET) + strlen(planet_coor) + 1 + strlen("key") + strlen(".txt") + 1;
     char planet_sec_path[l];
     planet_sec_path[0] = '\x00';
     strcat(planet_sec_path, PLANET);
     strcat(planet_sec_path, planet_coor);
+    strcat(planet_sec_path, "/");
     strcat(planet_sec_path, "key");
+    strcat(planet_sec_path, ".txt");
     printf("enter <password>\n");
     char password[17];
     fgets(password, 16, stdin);
@@ -182,7 +176,7 @@ void open_planet(int x, int y)
     my_file = fopen(planet_sec_path, "r");
     char check_pass[17];
     check_pass[0] = '\x00';
-    fgets(check_pass, 16, planet_sec_path);
+    fgets(check_pass, 16, my_file);
     int access;
     access = check_password(check_pass, password);
     if(check_pass[0] == '\x00')access = 2;
@@ -190,17 +184,28 @@ void open_planet(int x, int y)
     switch(access)
     {
         case 0:
-            pritf("Go away stranger\n");
-            return;
+            printf("Go away stranger\n");
+            break;
         case 2:
             //planet_capture()
-            return;
+            break;
         case 1:
             printf("This is your planet");
-            return;
-
+            break; 
     }
+    return;
 }
+
+void jump_random()
+{
+    int x, y;
+    srand(time(NULL));
+    x = (rand() - 20) % 4;
+    y = (rand() + 17) % 4;
+    open_planet(x, y);
+    return;
+}
+
 void status()
 {
     printf("You're inside\nNow you can continue your adventure(press h for help)\n");
@@ -211,8 +216,8 @@ void status()
             printf("1 - random jump\n2 - jump in coordinates\n3 - weapon\n4 - exit");
             break;
         case '1':
-            jump_random()
-             break;
+            jump_random();
+            break;
         // case '2':
         //     break;
         // case '3':
