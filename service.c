@@ -6,7 +6,6 @@
 #include <time.h>
 
 #define USERS_FOLDER "users/"
-#define PLANET "planets/"
 
 int user_exist(char *name)// check user
 {
@@ -77,10 +76,7 @@ int sign_in()
     equal = check_password(check_pass, password);
     if(equal){
         printf("Welcome home\n");
-        return 1; // сделать папку с планетками (x, y) матрицаб на каждой там бункеры с паролями, рандомная генерация ролла с пушками для убийства других плане
-                // можно прыгать рандомно, можно по координатам, которые знаешь, занять плнету можно, если ты прилетел на нее первый и поставил свой пароль
-                // взрывая чужую планету можнон получить секрет взорвавшегося(пароль от планеты) ++сделать планету pooper++
-                // 
+        return 1; 
     }
     printf("Wrong password\n");
     return 0;
@@ -100,6 +96,7 @@ int registration()
     fgets(password, 16, stdin);
 
     int n = strlen(name);
+
     name[n-1]='\x00';
     n = strlen(password);
     password[n-1]='\x00';
@@ -139,91 +136,77 @@ int registration()
     
 }
 
-void open_planet(int x, int y)
+void put_in_the_cell()
 {
-    char planet_coor[6];
-    sprintf(planet_coor, "%d%d.%d%d", x/ 10, x % 10, y/ 10, y % 10);
-    planet_coor[5] = 0;
+    printf("Enter your login\n");
+    char name[17];
+    int trash;
+    while(trash != 0xa)
+    {
+          trash = getc(stdin);
+    }
+    fgets(name, 16, stdin);
+    int n = strlen(name);
+    name[n-1]='\x00';
+    if(user_exist(name) == 0)
+    {   
+        printf("No such user\n");
+        return;
+    } 
+    n = strlen(USERS_FOLDER) + strlen(name) + strlen("/cells/") + 1;
+    char path[n];
+    path[0] = '\x00';
 
-    int l = strlen(PLANET) + 2 * strlen(planet_coor) + 1 + strlen(".txt") + 1;
-    char planet_path[l];
-    planet_path[0] = '\x00';
-    strcat(planet_path, PLANET);
-    strcat(planet_path, planet_coor);
-    strcat(planet_path, "/");
-    strcat(planet_path, planet_coor);
-    strcat(planet_path, ".txt");
+    strcat(path, USERS_FOLDER);
+    strcat(path, name);
+    strcat(path, "/cells/");
+    mkdir(path, 0700);
     FILE *my_file;
-    my_file = fopen(planet_path, "r");
+
+    printf("what would you like to put in a bank cell?\n");
+    char sample_thing[17];
+    fgets(sample_thing, 16, stdin);
+    sample_thing[16] = '\x00';
+    int a = strlen(path) + strlen(sample_thing);
+
+    char cell_path[a];
+    cell_path[0] = '\x00';
+    strcat(cell_path, path);
+    strcat(cell_path, sample_thing);
+    my_file = fopen(cell_path, "w");
     if(my_file == NULL)
     {
-        perror("sorry your file can't be opened:");
+        perror("sorry your cell unavailable: ");
         return;
-    }
-       //fprintf(planet_path, );
-    l = strlen(PLANET) + strlen(planet_coor) + 1 + strlen("key") + strlen(".txt") + 1;
-    char planet_sec_path[l];
-    planet_sec_path[0] = '\x00';
-    strcat(planet_sec_path, PLANET);
-    strcat(planet_sec_path, planet_coor);
-    strcat(planet_sec_path, "/");
-    strcat(planet_sec_path, "key");
-    strcat(planet_sec_path, ".txt");
-    printf("enter <password>\n");
-    char password[17];
-    fgets(password, 16, stdin);
-    
-    my_file = fopen(planet_sec_path, "r");
-    char check_pass[17];
-    check_pass[0] = '\x00';
-    fgets(check_pass, 16, my_file);
-    int access;
-    access = check_password(check_pass, password);
-    if(check_pass[0] == '\x00')access = 2;
+    } 
 
-    switch(access)
-    {
-        case 0:
-            printf("Go away stranger\n");
-            break;
-        case 2:
-            //planet_capture()
-            break;
-        case 1:
-            printf("This is your planet");
-            break; 
-    }
+    fputs(sample_thing, my_file);
+    fclose(my_file);
+    printf("your property is in a cell and is completely safe");
     return;
 }
-
-void jump_random()
-{
-    int x, y;
-    srand(time(NULL));
-    x = (rand() - 20) % 4;
-    y = (rand() + 17) % 4;
-    open_planet(x, y);
-    return;
-}
-
 void status()
 {
-    printf("You're inside\nNow you can continue your adventure(press h for help)\n");
+    printf("You're inside\n(press h for help)\n");
     int choice2;
+    while(1)
+    {
     choice2 = getc(stdin);
     switch(choice2){
         case 'h':
-            printf("1 - random jump\n2 - jump in coordinates\n3 - weapon\n4 - exit");
+            printf("1 - put something in the bank cell\n4 - exit\n");
             break;
-        case '1':
-            jump_random();
-            break;
+         case '1':
+            put_in_the_cell();
+             break;
         // case '2':
         //     break;
         // case '3':
         //     break;
-        // case '4':
-        //     break;
+         case '4':
+            return;
+             break;
+    }
     }
 }
 
@@ -259,6 +242,7 @@ int main(void)
         }
 
         if(status_reg == 1)status();
+        status_reg = 0;
     }
     
 end: 
