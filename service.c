@@ -4,9 +4,18 @@
 #include <stdlib.h>
 #include <errno.h> /* содержит объявления для errno */
 #include <time.h>
+#include <dirent.h>
 
 #define USERS_FOLDER "users/"
 
+void janitor()
+{
+    int trash;
+    while(trash != 0xa)
+    {
+        trash = getc(stdin);
+    }
+}
 int user_exist(char *name)// check user
 {
     int n = strlen(USERS_FOLDER) + strlen(name) + 1;
@@ -33,7 +42,7 @@ int check_password(char *check_pass, char *password)
     }
     return 1;
 }
-int sign_in()
+char *sign_in()
 {
     char name[17];
     char password[17];
@@ -59,7 +68,7 @@ int sign_in()
     if(user_exist(name) == 0)
     {
         printf("No such user\n");
-        return 0;
+        return '\x00';
     }
    
     int a = strlen(path) + strlen("/password");
@@ -75,16 +84,18 @@ int sign_in()
     int equal = 1;
     equal = check_password(check_pass, password);
     if(equal){
-        printf("Welcome home\n");
-        return 1; 
+        printf("Welcome\n");
+        char *str = (char *)malloc(sizeof(path));
+        strcat(str, path);
+    return str; 
     }
     printf("Wrong password\n");
-    return 0;
+    return '\x00';
 
 
 }
 
-int registration()
+char *registration()
 {   
     char name[17];
     char password[17];
@@ -105,7 +116,7 @@ int registration()
     {   
 
         printf("Choose another login\n");
-        return 0;
+        return '\x00';
     } 
  
     n = strlen(USERS_FOLDER) + strlen(name) + 1;
@@ -125,14 +136,16 @@ int registration()
     if(my_file == NULL)
     {
         perror("sorry your file can't be opened:");
-        return 0 ;
+        return '\x00';
     } 
 
     fputs(password, my_file);
     fclose(my_file);
-    printf("Success");
+    printf("Success\n");
     
-    return 1;
+    char *str = (char *)malloc(sizeof(path));
+    strcat(str, path);
+    return str;
     
 }
 
@@ -140,11 +153,7 @@ void put_in_the_cell()
 {
     printf("Enter your login\n");
     char name[17];
-    int trash;
-    while(trash != 0xa)
-    {
-          trash = getc(stdin);
-    }
+    janitor();
     fgets(name, 16, stdin);
     int n = strlen(name);
     name[n-1]='\x00';
@@ -182,67 +191,87 @@ void put_in_the_cell()
 
     fputs(sample_thing, my_file);
     fclose(my_file);
-    printf("your property is in a cell and is completely safe");
+    printf("your property is in a cell and is completely safe\n");
     return;
 }
-void status()
+void visit_bank_vault(char *path)
+{
+    int n = sizeof(path) + sizeof("/cells") + 1;
+    char cell_path[n];
+    strcat(cell_path, path);
+    strcat(cell_path, "/cells");
+    DIR *dir;
+    struct dirent *entry;
+
+    dir = opendir(cell_path);
+    if (!dir) {
+        perror("diropen");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    return;
+}
+
+int status(char *path)
 {
     printf("You're inside\n(press h for help)\n");
     int choice2;
     while(1)
     {
+        printf("1 - put something in the bank cell\n2 - visit bank vault\n4 - exit\n");
     choice2 = getc(stdin);
     switch(choice2){
-        case 'h':
-            printf("1 - put something in the bank cell\n4 - exit\n");
-            break;
          case '1':
             put_in_the_cell();
              break;
-        // case '2':
-        //     break;
+         case '2':
+            visit_bank_vault(path);
+             break;
         // case '3':
         //     break;
          case '4':
-            return;
+            return 0;
              break;
     }
     }
 }
 
-
 int main(void)
 {  
     int choice1;
-    int trash;
-    int status_reg = 0;
+    char path[128];
+    path[0] = '\x00';
     while(1)
     {
-        if(status_reg == 0){
+        if(path[0] == '\x00'){
             printf("sign in / regisration / exit? 1/2/0\n");
             choice1 = getc(stdin);
-            while(trash != 0xa){
-                trash = getc(stdin);
-            }
+            janitor();
             while(choice1 != '1' && choice1 != '2' && choice1 != '0'){
                 printf("Wrong input, try 1 or 2 maybe??\n");
+                janitor();
                 choice1 = getc(stdin);
             }
             switch(choice1)
             {
                 case '1': 
-                    status_reg = sign_in();
+                    strcat(path, sign_in());
                     break;
                 case '2': 
-                    status_reg = registration();
+                    strcat(path, registration());
                     break;
                 case '0':
                     goto end;
             }
         }
 
-        if(status_reg == 1)status();
-        status_reg = 0;
+        if(path[0] != '\x00')status(path);
+
     }
     
 end: 
