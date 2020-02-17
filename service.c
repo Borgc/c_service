@@ -5,6 +5,7 @@
 #include <errno.h> /* содержит объявления для errno */
 #include <time.h>
 #include <dirent.h>
+#include <time.h>
 
 #define USERS_FOLDER "users/"
 
@@ -68,7 +69,7 @@ char *sign_in()
     if(user_exist(name) == 0)
     {
         printf("No such user\n");
-        return '\x00';
+        return NULL;
     }
    
     int a = strlen(path) + strlen("/password");
@@ -81,8 +82,7 @@ char *sign_in()
     my_file = fopen(pass_path, "r");
     char check_pass[17];
     fgets(check_pass, 16, my_file);
-    int equal = 1;
-    equal = check_password(check_pass, password);
+    int equal = check_password(check_pass, password);
     if(equal){
         printf("Welcome\n");
         char *str = (char *)malloc(sizeof(path));
@@ -149,7 +149,7 @@ char *registration()
     
 }
 
-void put_in_the_cell()
+void put_secret()
 {
     printf("Enter your login\n");
     char name[17];
@@ -172,7 +172,7 @@ void put_in_the_cell()
     mkdir(path, 0700);
     FILE *my_file;
 
-    printf("what would you like to put in a bank cell?\n");
+    printf("Enter planet password\n");
     char sample_thing[17];
     fgets(sample_thing, 16, stdin);
     sample_thing[16] = '\x00';
@@ -185,15 +185,16 @@ void put_in_the_cell()
     my_file = fopen(cell_path, "w");
     if(my_file == NULL)
     {
-        perror("sorry your cell unavailable: ");
+        perror("sorry your vault unavailable: ");
         return;
     } 
 
     fputs(sample_thing, my_file);
     fclose(my_file);
-    printf("your property is in a cell and is completely safe\n");
+    printf("Planet under control now\n");
     return;
 }
+
 void visit_bank_vault(char *path)
 {
     int n = sizeof(path) + sizeof("/cells") + 1;
@@ -216,29 +217,96 @@ void visit_bank_vault(char *path)
     closedir(dir);
     return;
 }
+int planet_exist(char *coor)
+{
+    int n = strlen("planets/") + strlen(coor) + 1;
+    char path[n];
+    path[0] = '\x00';
 
+    strcat(path, "planets/");
+    strcat(path, coor);
+    puts(path);
+
+    struct stat buff;
+    if(stat(path, &buff) == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void create_planet(char *coor)
+{
+    int a = strlen("planet/") + strlen("coor/") + strlen("description");
+    char path[a];
+    path[0] = '\x00';
+    strcat(path, "planet/");
+    strcat(path, "coor/");
+    strcat(path, "description");
+    FILE *my_file;
+    my_file = fopen(path, "w");
+    if(my_file == NULL)
+    {
+        perror("sorry your planet unavailable: ");
+        return;
+    } 
+    int n;
+    char descr                                                   //CONTINUE HERE think about planet abilities and realization
+    switch(n){
+        case 1:
+            b = 
+            
+    }
+}
+
+const char* leeters = "ABCDEFGHIJKLMNOPQRSTXYZ";
+
+void teleport()
+{
+    srand(time(NULL));
+    char coor[5];
+    coor[4] = '\x00';
+    coor[0] = leeters[rand() % 26];
+    coor[1] = rand() % 10 + 48;
+    coor[2] = leeters[rand() % 26];
+    coor[3] = rand() % 10 + 48;
+    printf("coor = %s\n", coor);
+    if(planet_exist(coor)){
+        return;
+    } 
+    create_planet(coor);
+    return;
+
+}
 int status(char *path)
 {
-    printf("You're inside\n(press h for help)\n");
+    printf("You're inside\n");
     int choice2;
     while(1)
     {
-        printf("1 - put something in the bank cell\n2 - visit bank vault\n4 - exit\n");
+        printf("1 - teleport\n2 - visit my planet\n3 - watch my planets\n4 - help\n5 - exit\n");
     choice2 = getc(stdin);
+    janitor();
     switch(choice2){
          case '1':
-            put_in_the_cell();
+            teleport();
+            //put_secret();
              break;
          case '2':
-            visit_bank_vault(path);
+            //visit_bank_vault(path);
              break;
         // case '3':
         //     break;
          case '4':
-            return 0;
+            printf("Teleport is a random jump to another planet or no, who knows\n");
+            printf("Visit my planet - you are going to the planet on your spaceship\n");
+            printf("Watch my planets ...\n");
+         case '5':
+            return 1;
              break;
     }
     }
+
 }
 
 int main(void)
@@ -270,7 +338,13 @@ int main(void)
             }
         }
 
-        if(path[0] != '\x00')status(path);
+        if(path[0] != '\x00')
+        {
+            if(status(path))
+            {
+                goto end;
+            };
+        }
 
     }
     
