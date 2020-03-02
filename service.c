@@ -127,12 +127,13 @@ char *registration()
     strcat(path, name);
     FILE *my_file;
     mkdir(path, 0700);
-    int a = strlen(path) + strlen("/password");
+    int a = strlen(path) + strlen("/password") + 1;
     char pass_path[a];
     pass_path[0] = '\x00';
     strcat(pass_path, path);
     strcat(pass_path, "/password");
     my_file = fopen(pass_path, "w");
+    printf("%s\n", pass_path);
     if(my_file == NULL)
     {
         perror("sorry your file can't be opened:");
@@ -237,6 +238,7 @@ int planet_exist(char *coor)
 
 void create_planet(char *coor)
 {
+    srand(time(NULL));
     int a = strlen("planet/") + strlen("coor/") + strlen("description");
     char path[a];
     path[0] = '\x00';
@@ -250,12 +252,99 @@ void create_planet(char *coor)
         perror("sorry your planet unavailable: ");
         return;
     } 
-    int n;
-    char descr                                                   //CONTINUE HERE think about planet abilities and realization
-    switch(n){
-        case 1:
-            b = 
-            
+
+    int n = 0;          //CONTINUE HERE think about planet abilities and realization**watch "space.txt"**
+    char desc; 
+    char buffer_string[100];
+    while(n <= 50){
+    n = rand() % 101;      
+    if(n <= 20){desc = 'e';} // empty space
+    else if(n <= 40){desc = 'b';} // black hole
+    else if(n <= 50){desc = 's';} // space pirates
+    else if(n <= 60){desc = 'p';} // simple planet
+    else if(n <= 80){desc = 'g';} // planet with a gun
+    else if(n <= 99){desc = 'i';} // invisible planet with a gun
+    else if(n == 100){desc = 'x';} //invisible + death star
+
+    // #define GUN 0b100
+    // #define INVIS 0b010
+    // #define DEATHSTAR 0b001
+    switch(desc){
+        case 'e':
+            printf("empty space\n");
+            break;
+        case 'b':
+            printf("black hole\n");
+            break;
+        case 's':
+            printf("space pirates\n");
+        case 'p':
+            printf("simple planet\n");
+            printf("Give a name for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a password for your planet, don't forget it:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a description for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            //fputs("\n", my_file);
+            break;
+        case 'g':
+            printf("planet with a gun\n");
+            printf("Give a name for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a password for your planet, don't forget it:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a description for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            //fputs(GUN, my_file);
+            break;
+        case 'i':
+            printf("invisible planet with a gun\n");
+            printf("Give a name for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a password for your planet, don't forget it:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a description for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            // //fputs(GUN + INVIS, my_file);
+            break;
+        case 'x':
+            printf("invisible + death star\n");
+            printf("Give a name for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a password for your planet, don't forget it:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            printf("Give a description for your planet:");
+            fgets(buffer_string, 99, stdin);
+            janitor();
+            fputs(buffer_string, my_file);
+            // uint8_t opts = GUN | INVIS | DEATHSTAR;
+            // //fputs(GUN + INVIS + DEATHSTAR, my_file);
+            // fprintf(my_file, "%d", opts);
+            break;
+    }
     }
 }
 
