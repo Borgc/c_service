@@ -290,10 +290,9 @@ int status(char *path)
     switch(choice2){
          case '1':
             teleport();
-            //put_secret();
              break;
          case '2':
-            //visit_bank_vault(path);
+        //
              break;
         // case '3':
         //     break;

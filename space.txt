@@ -1,0 +1,44 @@
+space/
+    112-234/
+        profile.txt <- structured file, e.g.
+            Name
+
+            Password
+            Description
+            ...
+
+
+1. Move to any given pair of coordinates (x,y) -> ./space/112-234/
+2. Teleport to any free space coordinates + create planet + capture
+3. Any free planet could be captured:
+    - Give Name, Description, Password
+    - Description is a secret and could be viewed only after correct password auth
+4. User can list all his planets (./users/name/planets.txt)
+
+* Ensure that nobody could capture all the planets
+    -> Unlimited space?
+
+(!) Possible vulnerabilities
+1) Find a planet (?) -> rewrite public field to break file structure and rewrite password -> get secrets
+2) "File path modification on register": find a user (??) -> register with filepath name (shit/../old) -> override password
+
+
+
+
+
+Users:
+./users/name/password.txt
+
+register
+vasya/../petya
+password
+
+-> listing
+petya
+alice
+
+f = fopen("./users/vasya/../petya/password.txt", "w")
+fputs(f, password)
+fclose(f)
+
+
